@@ -1,0 +1,265 @@
+<UserControl x:Class="CyberGame.Client.Views.CustomerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:enums="clr-namespace:CyberGame.Domain.Enums;assembly=CyberGame.Domain"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Quản lý hội viên &amp; Ví tài khoản" Style="{StaticResource Heading1}"/>
+                <TextBlock Text="Danh sách hội viên, nạp tiền ví, lịch sử biến động số dư và yêu cầu từ máy khách" Style="{StaticResource MutedText}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="+ Thêm hội viên mới" Command="{Binding OpenCreateCustomerCommand}" Click="OpenCreateMember_Click" Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
+                <Button Content="Tìm kiếm" Command="{Binding SearchCommand}" Style="{StaticResource OutlineButton}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Search Bar & Messages -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource StandardTextBox}" 
+                         Height="38"
+                         Tag="Tìm kiếm theo mã hội viên, họ tên hoặc số điện thoại..."/>
+            </Grid>
+
+            <!-- Alerts -->
+            <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                <Border Background="#FEF2F2" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,4"
+                        Visibility="{Binding HasError, Converter={StaticResource BoolToVisConverter}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontSize="12"/>
+                </Border>
+                <Border Background="#F0FDF4" BorderBrush="{StaticResource SuccessBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,4"
+                        Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVisConverter}}">
+                    <TextBlock Text="{Binding SuccessMessage}" Foreground="{StaticResource SuccessBrush}" FontSize="12"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- Content Area: Master - Detail -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Customers DataGrid -->
+            <Border Grid.Column="0" Style="{StaticResource CardPanel}" Margin="0,0,12,0">
+                <DataGrid ItemsSource="{Binding Customers}" 
+                          SelectedItem="{Binding SelectedCustomer}"
+                          IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã HV" Binding="{Binding Code}" Width="100"/>
+                        <DataGridTextColumn Header="Họ và tên" Binding="{Binding FullName}" Width="*"/>
+                        <DataGridTextColumn Header="Số điện thoại" Binding="{Binding Phone}" Width="120"/>
+                        <DataGridTextColumn Header="Nhóm" Binding="{Binding CustomerGroupName, TargetNullValue='Tiêu chuẩn'}" Width="110"/>
+                        <DataGridTextColumn Header="Số dư ví" Binding="{Binding WalletBalance, Converter={StaticResource CurrencyConverter}}" Width="110"/>
+                        <DataGridTextColumn Header="Trạng thái" Binding="{Binding Status}" Width="90"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <!-- Right: Detail & Wallet Ledger -->
+            <Border Grid.Column="1" Style="{StaticResource CardPanel}" Margin="12,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header with Top-Up & PIN Buttons -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <TextBlock Text="Thông tin &amp; Biến động ví" Style="{StaticResource Heading2}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="{Binding SelectedCustomerStatusActionText}"
+                                    Command="{Binding ToggleCustomerStatusCommand}"
+                                    Style="{StaticResource OutlineButton}"
+                                    Height="32"
+                                    Margin="0,0,8,0"/>
+                            <Button Content="CÀI ĐẶT PIN" 
+                                    Command="{Binding OpenSetPinCommand}" 
+                                    Click="OpenSetPin_Click"
+                                    Style="{StaticResource OutlineButton}" 
+                                    Height="32"
+                                    Margin="0,0,8,0"/>
+                            <Button Content="NẠP TIỀN VÍ" 
+                                    Command="{Binding OpenTopUpCommand}" 
+                                    Style="{StaticResource BrandButton}" 
+                                    Height="32"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Selected Member Overview -->
+                    <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,16">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <TextBlock Text="Hội viên:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SelectedCustomer.FullName, FallbackValue='--'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right" FontWeight="Bold"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,6">
+                                <TextBlock Text="Mã số:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SelectedCustomer.Code, FallbackValue='--'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="SỐ DƯ VÍ HIỆN TẠI:" Style="{StaticResource BodyText}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding SelectedCustomer.WalletBalance, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" 
+                                           Style="{StaticResource SectionHeading}" 
+                                           Foreground="{StaticResource PrimaryBrush}" 
+                                           HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tabs: Ledger & Pending Top-Up Requests -->
+                    <TabControl Grid.Row="2" Background="Transparent" BorderThickness="0">
+                        <TabItem Header="Lịch sử giao dịch ví">
+                            <DataGrid ItemsSource="{Binding WalletTransactions}" IsReadOnly="True" Margin="0,8,0,0">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Loại GD" Binding="{Binding Type}" Width="80"/>
+                                    <DataGridTextColumn Header="Biến động" Binding="{Binding Amount, Converter={StaticResource CurrencyConverter}}" Width="95"/>
+                                    <DataGridTextColumn Header="Số dư sau" Binding="{Binding BalanceAfter, Converter={StaticResource CurrencyConverter}}" Width="95"/>
+                                    <DataGridTextColumn Header="Nội dung" Binding="{Binding Description}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </TabItem>
+                        <TabItem Header="Yêu cầu nạp chờ duyệt">
+                            <Grid Margin="0,8,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,6">
+                                    <Button Content="Làm mới" Command="{Binding RefreshTopUpRequestsCommand}" Style="{StaticResource OutlineButton}" Height="28" Padding="10,0"/>
+                                </StackPanel>
+                                <DataGrid Grid.Row="1" ItemsSource="{Binding PendingTopUpRequests}" SelectedItem="{Binding SelectedTopUpRequest}" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Mã HV" Binding="{Binding CustomerCode}" Width="75"/>
+                                        <DataGridTextColumn Header="Họ tên" Binding="{Binding CustomerName}" Width="100"/>
+                                        <DataGridTextColumn Header="Số tiền" Binding="{Binding Amount, Converter={StaticResource CurrencyConverter}}" Width="95"/>
+                                        <DataGridTextColumn Header="Ghi chú" Binding="{Binding Note}" Width="*"/>
+                                        <DataGridTemplateColumn Header="Thao tác" Width="135">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <Button Content="Duyệt" 
+                                                                Command="{Binding DataContext.ApproveTopUpRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource PrimaryButton}" 
+                                                                Height="24" Padding="6,2" Margin="0,0,4,0" FontSize="11"/>
+                                                        <Button Content="Từ chối" 
+                                                                Command="{Binding DataContext.RejectTopUpRequestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource DangerButton}" 
+                                                                Height="24" Padding="6,2" FontSize="11"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Create Customer Dialog Overlay -->
+        <Border Grid.RowSpan="3" Background="#80000000" Visibility="{Binding IsCreateCustomerDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Đăng ký tài khoản hội viên mới" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Mã hội viên (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding NewCode, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Họ và tên (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding NewFullName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Số điện thoại:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding NewPhone, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Mã PIN đăng nhập máy khách (đúng 6 số) (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <PasswordBox x:Name="CreatePinBox" PasswordChanged="CreatePinBox_OnPasswordChanged" MaxLength="6" Padding="10,7" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Số tiền nạp ban đầu (đ):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding InitialDeposit, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelCreateCustomerCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="LƯU HỘI VIÊN" Command="{Binding ConfirmCreateCustomerCommand}" Style="{StaticResource PrimaryButton}" Width="120"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Top-Up Wallet Dialog Overlay -->
+        <Border Grid.RowSpan="3" Background="#80000000" Visibility="{Binding IsTopUpDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Nạp tiền vào ví hội viên" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding SelectedCustomer.FullName, StringFormat='Hội viên: {0}'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Số tiền nạp (đ) (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding TopUpAmount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Phương thức thanh toán:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <ComboBox SelectedItem="{Binding TopUpMethod}" Margin="0,0,0,12">
+                        <enums:PaymentMethod>Cash</enums:PaymentMethod>
+                        <enums:PaymentMethod>BankTransfer</enums:PaymentMethod>
+                    </ComboBox>
+
+                    <TextBlock Text="Ghi chú:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding TopUpNote, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelTopUpCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="XÁC NHẬN NẠP" Command="{Binding ConfirmTopUpCommand}" Style="{StaticResource PrimaryButton}" Width="120"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Set PIN Dialog Overlay -->
+        <Border Grid.RowSpan="3" Background="#80000000" Visibility="{Binding IsSetPinDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="380" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Thiết lập mã PIN hội viên" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding SelectedCustomer.FullName, StringFormat='Hội viên: {0}'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="Mã PIN đúng 6 chữ số dùng để đăng nhập máy trạm (Member Client)." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Mã PIN mới (6 chữ số):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <PasswordBox x:Name="SetPinBox" PasswordChanged="SetPinBox_OnPasswordChanged" MaxLength="6" Padding="10,7" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelSetPinCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="LƯU MÃ PIN" Command="{Binding ConfirmSetPinCommand}" Style="{StaticResource PrimaryButton}" Width="120"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

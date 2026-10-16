@@ -1,0 +1,254 @@
+<UserControl x:Class="CyberGame.Client.Views.StationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <!-- Main Content -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="340"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Station Grid & Filters -->
+            <Grid Grid.Column="0" Margin="0,0,16,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Grid.Row="0" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Sơ đồ phòng máy" Style="{StaticResource Heading1}"/>
+                        <TextBlock Text="Theo dõi phiên được mở tự động khi hội viên đăng nhập từ Member Client" Style="{StaticResource MutedText}"/>
+                    </StackPanel>
+                    <Button Content="Làm mới" Command="{Binding RefreshCommand}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Filters -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,16">
+                    <TextBlock Text="Khu vực:" Style="{StaticResource BodyText}" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                    <ComboBox ItemsSource="{Binding Groups}" 
+                              SelectedItem="{Binding SelectedGroupFilter}" 
+                              DisplayMemberPath="Name" 
+                              Width="160" 
+                              Margin="0,0,16,0"/>
+
+                    <TextBlock Text="Trạng thái:" Style="{StaticResource BodyText}" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                    <ComboBox SelectedItem="{Binding SelectedStatusFilter}" Width="140">
+                        <ComboBoxItem Content="Tất cả" IsSelected="True"/>
+                        <ComboBoxItem Content="Sẵn sàng"/>
+                        <ComboBoxItem Content="Đang sử dụng"/>
+                        <ComboBoxItem Content="Bảo trì"/>
+                        <ComboBoxItem Content="Ngoại tuyến"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Station Cards Grid -->
+                <Border Grid.Row="2" Style="{StaticResource CardPanel}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ListBox ItemsSource="{Binding FilteredMachines}" 
+                                 SelectedItem="{Binding SelectedMachine}"
+                                 BorderThickness="0"
+                                 Background="Transparent">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="6"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <ContentPresenter/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding Status, Converter={StaticResource MachineStatusBadgeBgConverter}}"
+                                            BorderBrush="{Binding Status, Converter={StaticResource MachineStatusBrushConverter}}"
+                                            BorderThickness="2"
+                                            CornerRadius="8"
+                                            Width="140"
+                                            Height="130"
+                                            Padding="10"
+                                            Cursor="Hand">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Code}" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding GroupName}" Style="{StaticResource MutedText}" HorizontalAlignment="Center" Margin="0,2,0,4"/>
+                                            <TextBlock Text="{Binding CurrentCustomerName, TargetNullValue='Máy trống'}" Style="{StaticResource MutedText}" HorizontalAlignment="Center" Margin="0,0,0,4" TextTrimming="CharacterEllipsis"/>
+                                            <Border Background="{Binding Status, Converter={StaticResource MachineStatusBrushConverter}}"
+                                                    CornerRadius="4" 
+                                                    Padding="8,3" 
+                                                    HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding Status, Converter={StaticResource MachineStatusTextConverter}}" 
+                                                           Foreground="White" 
+                                                           FontSize="11" 
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <!-- Right: Detail Action Panel -->
+            <Border Grid.Column="1" Style="{StaticResource CardPanel}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Title -->
+                        <TextBlock Text="Chi tiết máy trạm" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                        <!-- Notification Banner -->
+                        <Border Background="#FEF2F2" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,12"
+                                Visibility="{Binding HasError, Converter={StaticResource BoolToVisConverter}}">
+                            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontSize="12" TextWrapping="Wrap"/>
+                        </Border>
+                        <Border Background="#F0FDF4" BorderBrush="{StaticResource SuccessBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,12"
+                                Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVisConverter}}">
+                            <TextBlock Text="{Binding SuccessMessage}" Foreground="{StaticResource SuccessBrush}" FontSize="12" TextWrapping="Wrap"/>
+                        </Border>
+
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="Mã máy:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding SelectedMachine.Code, FallbackValue='--'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="Khu vực:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding SelectedMachine.GroupName, FallbackValue='--'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Grid Margin="0,0,0,16">
+                            <TextBlock Text="Trạng thái:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding SelectedMachine.Status, Converter={StaticResource MachineStatusTextConverter}, FallbackValue='--'}" 
+                                       Style="{StaticResource BodyText}" 
+                                       HorizontalAlignment="Right" 
+                                       FontWeight="Bold"/>
+                        </Grid>
+
+                        <Separator Background="{StaticResource BorderBrush}" Margin="0,0,0,16"/>
+
+                        <!-- Active Session Section (when InUse) -->
+                        <StackPanel Visibility="{Binding ActiveSessionForSelected, Converter={StaticResource NullToVisConverter}}">
+                            <TextBlock Text="Thông tin phiên chơi" Style="{StaticResource SectionHeading}" Margin="0,0,0,12"/>
+                            
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="Mã phiên:" Style="{StaticResource MutedText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.SessionNumber}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="Hội viên:" Style="{StaticResource MutedText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.CustomerName, TargetNullValue='Khách vãng lai'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="Hình thức:" Style="{StaticResource MutedText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.BillingMode}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="Bắt đầu lúc:" Style="{StaticResource MutedText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.StartedAtUtc, StringFormat='{}{0:HH:mm dd/MM/yyyy}'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right" FontWeight="Bold"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="Tiền giờ:" Style="{StaticResource MutedText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.UsageAmount, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="Tiền dịch vụ:" Style="{StaticResource MutedText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.ServiceAmount, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,16">
+                                <TextBlock Text="Tạm tính:" Style="{StaticResource BodyText}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.TotalAmount, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource BodyText}" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <!-- InUse Actions -->
+                            <Button Content="Tạm dừng phiên" Command="{Binding PauseSessionCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,0,8"/>
+                            <Button Content="Tiếp tục phiên" Command="{Binding ResumeSessionCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,0,8"/>
+                            <Button Content="Chuyển máy" Command="{Binding OpenTransferCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,0,8"/>
+                            <Button Content="KẾT THÚC &amp; TÍNH TIỀN" Command="{Binding OpenCompleteSessionCommand}" Style="{StaticResource PrimaryButton}" Margin="0,8,0,0"/>
+                        </StackPanel>
+
+                        <!-- Available Action -->
+                        <StackPanel Visibility="{Binding HasActiveSessionForSelected, Converter={StaticResource InverseBoolToVisConverter}}">
+                            <Border Background="#EFF6FF" BorderBrush="{StaticResource InfoBrush}" BorderThickness="1" CornerRadius="6" Padding="12">
+                                <TextBlock Text="Máy đang trống. Phiên chơi sẽ tự xuất hiện khi hội viên chọn máy này và đăng nhập từ Member Client."
+                                           Style="{StaticResource MutedText}"
+                                           TextWrapping="Wrap"/>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Transfer Session Dialog Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsTransferDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="400" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Chuyển phiên chơi sang máy khác" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding SelectedMachine.Code, StringFormat='Chuyển từ máy: {0}'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Chọn máy đích (trống):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <ComboBox ItemsSource="{Binding AvailableMachinesForTransfer}" 
+                              SelectedItem="{Binding TransferTargetMachine}" 
+                              DisplayMemberPath="Code" 
+                              Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelTransferCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="Xác nhận" Command="{Binding ConfirmTransferCommand}" Style="{StaticResource PrimaryButton}" Width="100"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Complete Session Dialog Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsCompleteSessionDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="450" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Xác nhận kết thúc phiên &amp; In hóa đơn" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding SelectedMachine.Code, StringFormat='Máy trạm: {0}'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding ActiveSessionForSelected.CustomerName, StringFormat='Hội viên: {0}', TargetNullValue='Hội viên: Khách vãng lai'}" Style="{StaticResource BodyText}" Margin="0,0,0,16"/>
+
+                    <Border Background="#EFF6FF" CornerRadius="6" Padding="12" Margin="0,0,0,16">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <TextBlock Text="Tiền giờ chơi:" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.UsageAmount, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource BodyText}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,6">
+                                <TextBlock Text="Tiền dịch vụ / món ăn:" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.ServiceAmount, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource BodyText}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                            </Grid>
+                            <Separator Background="#BFDBFE" Margin="0,4,0,6"/>
+                            <Grid>
+                                <TextBlock Text="TỔNG TIỀN THANH TOÁN:" Style="{StaticResource BodyText}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding ActiveSessionForSelected.TotalAmount, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource Heading2}" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Đóng" Command="{Binding CloseCompleteSessionDialogCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="THANH TOÁN" Command="{Binding ConfirmCompleteSessionCommand}" Style="{StaticResource PrimaryButton}" Width="120"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

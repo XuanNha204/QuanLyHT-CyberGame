@@ -1,0 +1,164 @@
+<UserControl x:Class="CyberGame.Client.Views.MaintenanceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:enums="clr-namespace:CyberGame.Domain.Enums;assembly=CyberGame.Domain"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Bảo trì &amp; Quản lý sự cố thiết bị" Style="{StaticResource Heading1}"/>
+                <TextBlock Text="Ghi nhận hỏng hóc phần cứng, phần mềm máy trạm và theo dõi tiến độ sửa chữa" Style="{StaticResource MutedText}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="+ Báo sự cố mới" Command="{Binding OpenCreateTicketCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
+                <Button Content="Làm mới" Command="{Binding RefreshCommand}" Style="{StaticResource OutlineButton}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Alerts -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,16">
+            <Border Background="#FEF2F2" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,6"
+                    Visibility="{Binding HasError, Converter={StaticResource BoolToVisConverter}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontSize="12"/>
+            </Border>
+            <Border Background="#F0FDF4" BorderBrush="{StaticResource SuccessBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,6"
+                    Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVisConverter}}">
+                <TextBlock Text="{Binding SuccessMessage}" Foreground="{StaticResource SuccessBrush}" FontSize="12"/>
+            </Border>
+        </StackPanel>
+
+        <!-- Content Area -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Tickets DataGrid -->
+            <Border Grid.Column="0" Style="{StaticResource CardPanel}" Margin="0,0,12,0">
+                <DataGrid ItemsSource="{Binding Tickets}" 
+                          SelectedItem="{Binding SelectedTicket}"
+                          IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã sự cố" Binding="{Binding TicketNumber}" Width="110"/>
+                        <DataGridTextColumn Header="Máy trạm" Binding="{Binding MachineCode}" Width="90"/>
+                        <DataGridTextColumn Header="Tiêu đề sự cố" Binding="{Binding Title}" Width="*"/>
+                        <DataGridTextColumn Header="Mức ưu tiên" Binding="{Binding Priority}" Width="100"/>
+                        <DataGridTextColumn Header="Trạng thái" Binding="{Binding Status}" Width="100"/>
+                        <DataGridTextColumn Header="Kỹ thuật viên" Binding="{Binding AssignedToUserName, TargetNullValue='Chưa gán'}" Width="110"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <!-- Ticket Detail Panel -->
+            <Border Grid.Column="1" Style="{StaticResource CardPanel}" Margin="12,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Chi tiết phiếu sự cố" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="Mã phiếu:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SelectedTicket.TicketNumber, FallbackValue='--'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right" FontWeight="Bold"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="Máy trạm:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SelectedTicket.MachineCode, FallbackValue='--'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="Mức độ ưu tiên:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SelectedTicket.Priority, FallbackValue='--'}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,8">
+                        <TextBlock Text="Trạng thái:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SelectedTicket.Status, FallbackValue='--'}" Style="{StaticResource SectionHeading}" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <Separator Background="{StaticResource BorderBrush}" Margin="0,8,0,12"/>
+
+                    <TextBlock Text="Mô tả sự cố:" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <Border Background="#F8FAFC" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,16">
+                        <TextBlock Text="{Binding SelectedTicket.Description, FallbackValue='Chưa có mô tả chi tiết'}" Style="{StaticResource BodyText}" TextWrapping="Wrap"/>
+                    </Border>
+
+                    <Button Content="CẬP NHẬT TIẾN ĐỘ" 
+                            Command="{Binding OpenUpdateTicketCommand}" 
+                            Style="{StaticResource BrandButton}" 
+                            Height="38"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Create Ticket Dialog Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsCreateTicketDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Báo sự cố thiết bị mới" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Chọn máy trạm (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <ComboBox ItemsSource="{Binding Machines}" 
+                              SelectedItem="{Binding CreateMachine}" 
+                              DisplayMemberPath="Code" 
+                              Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Mức độ ưu tiên:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <ComboBox SelectedItem="{Binding CreatePriority}" Margin="0,0,0,12">
+                        <enums:MaintenancePriority>Low</enums:MaintenancePriority>
+                        <enums:MaintenancePriority>Medium</enums:MaintenancePriority>
+                        <enums:MaintenancePriority>High</enums:MaintenancePriority>
+                        <enums:MaintenancePriority>Critical</enums:MaintenancePriority>
+                    </ComboBox>
+
+                    <TextBlock Text="Tiêu đề tóm tắt (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding CreateTitle, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Mô tả hiện tượng chi tiết:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding CreateDescription, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Height="60" TextWrapping="Wrap" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelCreateTicketCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="LẬP PHIẾU" Command="{Binding ConfirmCreateTicketCommand}" Style="{StaticResource PrimaryButton}" Width="120"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Update Ticket Dialog Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsUpdateTicketDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Cập nhật xử lý sự cố" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Trạng thái mới:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <ComboBox SelectedItem="{Binding UpdateStatus}" Margin="0,0,0,12">
+                        <enums:MaintenanceStatus>Open</enums:MaintenanceStatus>
+                        <enums:MaintenanceStatus>InProgress</enums:MaintenanceStatus>
+                        <enums:MaintenanceStatus>Resolved</enums:MaintenanceStatus>
+                        <enums:MaintenanceStatus>Closed</enums:MaintenanceStatus>
+                    </ComboBox>
+
+                    <TextBlock Text="Nhật ký xử lý / ghi chú (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding UpdateLogNote, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Height="60" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Chi phí sửa chữa (đ) (nếu có):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding UpdateCost, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelUpdateTicketCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="LƯU CẬP NHẬT" Command="{Binding ConfirmUpdateTicketCommand}" Style="{StaticResource PrimaryButton}" Width="120"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

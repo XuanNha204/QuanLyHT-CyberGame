@@ -1,0 +1,198 @@
+<UserControl x:Class="CyberGame.Client.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1000"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header / Actions -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Bảng điều khiển &amp; Chỉ số vận hành" Style="{StaticResource Heading1}"/>
+                <TextBlock Text="Cập nhật thời gian thực về doanh thu, phòng máy và cảnh báo tồn kho" Style="{StaticResource MutedText}"/>
+            </StackPanel>
+            <Button Content="Làm mới dữ liệu" 
+                    Command="{Binding RefreshCommand}" 
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Center"
+                    Style="{StaticResource OutlineButton}"/>
+        </Grid>
+
+        <!-- KPI Cards Grid -->
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,24">
+            <!-- Doanh thu hôm nay -->
+            <Border Style="{StaticResource CardPanel}" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="DOANH THU HÔM NAY" Style="{StaticResource MutedText}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Summary.TodayRevenue, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" 
+                               Style="{StaticResource Heading1}" 
+                               Foreground="{StaticResource PrimaryBrush}" 
+                               Margin="0,8,0,4"/>
+                    <TextBlock Text="Bao gồm tiền giờ &amp; dịch vụ" Style="{StaticResource MutedText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Tỷ lệ máy hoạt động -->
+            <Border Style="{StaticResource CardPanel}" Margin="6,0,6,0">
+                <StackPanel>
+                    <TextBlock Text="MÁY ĐANG HOẠT ĐỘNG" Style="{StaticResource MutedText}" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,4">
+                        <TextBlock Text="{Binding Summary.InUseMachines, FallbackValue='0'}" 
+                                   Style="{StaticResource Heading1}" 
+                                   Foreground="{StaticResource InfoBrush}"/>
+                        <TextBlock Text="/" Style="{StaticResource Heading1}" Foreground="{StaticResource MutedForegroundBrush}" Margin="4,0"/>
+                        <TextBlock Text="{Binding Summary.TotalMachines, FallbackValue='0'}" 
+                                   Style="{StaticResource Heading1}" 
+                                   Foreground="{StaticResource ForegroundBrush}"/>
+                    </StackPanel>
+                    <TextBlock Text="Máy trạm đang có khách chơi" Style="{StaticResource MutedText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Phiên đang mở -->
+            <Border Style="{StaticResource CardPanel}" Margin="6,0,6,0">
+                <StackPanel>
+                    <TextBlock Text="PHIÊN CHƠI ĐANG MỞ" Style="{StaticResource MutedText}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Summary.ActiveSessionsCount, FallbackValue='0'}" 
+                               Style="{StaticResource Heading1}" 
+                               Foreground="{StaticResource SuccessBrush}" 
+                               Margin="0,8,0,4"/>
+                    <TextBlock Text="Khách hội viên &amp; vãng lai" Style="{StaticResource MutedText}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Cảnh báo tồn kho -->
+            <Border Style="{StaticResource CardPanel}" Margin="12,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="MẶT HÀNG SẮP HẾT" Style="{StaticResource MutedText}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Summary.LowStockCount, FallbackValue='0'}" 
+                               Style="{StaticResource Heading1}" 
+                               Foreground="{StaticResource DangerBrush}" 
+                               Margin="0,8,0,4"/>
+                    <TextBlock Text="Cần nhập bổ sung kho" Style="{StaticResource MutedText}"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Status Overview & Machines Grid -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Machine Status Grid -->
+            <Border Grid.Column="0" Style="{StaticResource CardPanel}" Margin="0,0,12,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Trạng thái máy trạm thời gian thực" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Machines}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding Status, Converter={StaticResource MachineStatusBadgeBgConverter}}"
+                                            BorderBrush="{Binding Status, Converter={StaticResource MachineStatusBrushConverter}}"
+                                            BorderThickness="1.5"
+                                            CornerRadius="8"
+                                            Width="130"
+                                            Height="95"
+                                            Margin="6"
+                                            Padding="8">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Code}" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding MachineGroupName}" Style="{StaticResource MutedText}" HorizontalAlignment="Center" Margin="0,2"/>
+                                            <Border Background="{Binding Status, Converter={StaticResource MachineStatusBrushConverter}}"
+                                                    CornerRadius="4" 
+                                                    Padding="6,2" 
+                                                    HorizontalAlignment="Center" 
+                                                    Margin="0,4,0,0">
+                                                <TextBlock Text="{Binding Status, Converter={StaticResource MachineStatusTextConverter}}" 
+                                                           Foreground="White" 
+                                                           FontSize="11" 
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Right: Status Breakdown Summary -->
+            <Border Grid.Column="1" Style="{StaticResource CardPanel}" Margin="12,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Phân bổ trạng thái" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="Máy sẵn sàng (Trống)" Style="{StaticResource BodyText}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding AvailableCount}" FontWeight="Bold" Style="{StaticResource BodyText}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Fill="{StaticResource InfoBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="Đang có khách sử dụng" Style="{StaticResource BodyText}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding InUseCount}" FontWeight="Bold" Style="{StaticResource BodyText}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Fill="{StaticResource AccentBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="Đang bảo trì / Sự cố" Style="{StaticResource BodyText}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding MaintenanceCount}" FontWeight="Bold" Style="{StaticResource BodyText}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Fill="{StaticResource MutedForegroundBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="Ngoại tuyến / Tắt máy" Style="{StaticResource BodyText}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding OfflineCount}" FontWeight="Bold" Style="{StaticResource BodyText}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

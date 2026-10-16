@@ -1,0 +1,236 @@
+<UserControl x:Class="CyberGame.Client.Views.ShiftView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:enums="clr-namespace:CyberGame.Domain.Enums;assembly=CyberGame.Domain"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Quản lý ca làm việc &amp; Bàn giao quỹ" Style="{StaticResource Heading1}"/>
+                <TextBlock Text="Mở ca, đối soát tiền mặt thời gian thực, quản lý thu chi và chốt ca thu ngân" Style="{StaticResource MutedText}"/>
+            </StackPanel>
+            <Button Content="Làm mới" Command="{Binding RefreshCommand}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Alerts -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,16">
+            <Border Background="#FEF2F2" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,6"
+                    Visibility="{Binding HasError, Converter={StaticResource BoolToVisConverter}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontSize="12"/>
+            </Border>
+            <Border Background="#F0FDF4" BorderBrush="{StaticResource SuccessBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,6"
+                    Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVisConverter}}">
+                <TextBlock Text="{Binding SuccessMessage}" Foreground="{StaticResource SuccessBrush}" FontSize="12"/>
+            </Border>
+        </StackPanel>
+
+        <!-- Shift Status Content -->
+        <Grid Grid.Row="2">
+            <!-- State 1: Active Shift -->
+            <Border Style="{StaticResource CardPanel}" Visibility="{Binding HasActiveShift, Converter={StaticResource BoolToVisConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Top Shift Bar -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Background="#DCFCE7" CornerRadius="6" Padding="10,4" Margin="0,0,12,0">
+                                <TextBlock Text="CA ĐANG HOẠT ĐỘNG" Foreground="{StaticResource SuccessBrush}" FontWeight="Bold" FontSize="12"/>
+                            </Border>
+                            <TextBlock Text="{Binding CurrentShift.ShiftNumber, StringFormat='Mã ca: #{0}'}" Style="{StaticResource Heading2}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="+ Thu / Chi phát sinh" Command="{Binding OpenCashMovementCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,10,0"/>
+                            <Button Content="CHỐT &amp; ĐÓNG CA" Command="{Binding CloseShiftCommand}" Style="{StaticResource DangerButton}" Height="36"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Shift Info Summary -->
+                    <Grid Grid.Row="1" Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Background="#F8FAFC" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="THU NGÂN PHỤ TRÁCH" Style="{StaticResource MutedText}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding CurrentShift.UserFullName}" Style="{StaticResource SectionHeading}" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Background="#F8FAFC" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="14" Margin="4,0,4,0">
+                            <StackPanel>
+                                <TextBlock Text="THỜI GIAN MỞ CA" Style="{StaticResource MutedText}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding CurrentShift.StartedAtUtc, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Style="{StaticResource SectionHeading}" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Background="#F8FAFC" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="14" Margin="8,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="TIỀN ĐẦU CA" Style="{StaticResource MutedText}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding CurrentShift.OpeningCash, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource SectionHeading}" Foreground="{StaticResource PrimaryBrush}" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Cash Breakdown Formula Panel -->
+                    <Border Grid.Row="2" Background="#EFF6FF" BorderBrush="#BFDBFE" BorderThickness="1" CornerRadius="8" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="BẢNG ĐỐI SOÁT TIỀN MẶT HIỆN TẠI TRONG KÉT" Style="{StaticResource SectionHeading}" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,0,16"/>
+
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="1. Tiền mặt ban đầu khi mở ca:" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding ShiftSummary.OpeningCash, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="2. (+) Tiền mặt nạp ví hội viên trong ca:" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding ShiftSummary.TotalCashTopUps, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="3. (+) Tiền mặt thanh toán giờ chơi &amp; dịch vụ:" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding ShiftSummary.TotalCashSales, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="4. (+) Thu tiền mặt phát sinh trong ca:" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding ShiftSummary.TotalCashIn, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,14">
+                                <TextBlock Text="5. (-) Chi tiền mặt phát sinh trong ca:" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding ShiftSummary.TotalCashOut, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Foreground="{StaticResource DangerBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <Separator Background="#BFDBFE" Margin="0,0,0,14"/>
+
+                            <Grid>
+                                <TextBlock Text="TIỀN MẶT KỲ VỌNG TRONG KÉT:" Style="{StaticResource Heading2}"/>
+                                <TextBlock Text="{Binding ShiftSummary.ExpectedCash, Converter={StaticResource CurrencyConverter}, FallbackValue='0 đ'}" 
+                                           Style="{StaticResource Heading1}" 
+                                           Foreground="{StaticResource PrimaryBrush}" 
+                                           HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- State 2: No Active Shift -->
+            <Border Style="{StaticResource CardPanel}" Visibility="{Binding HasActiveShift, Converter={StaticResource InverseBoolToVisConverter}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="CHƯA CÓ CA LÀM VIỆC NÀO ĐANG MỞ" Style="{StaticResource Heading1}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="Thu ngân cần mở ca làm việc để thực hiện các giao dịch nạp ví, bán dịch vụ và thu tiền mặt." 
+                               Style="{StaticResource MutedText}" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,0,0,24"/>
+                    <Button Content="MỞ CA LÀM VIỆC MỚI" 
+                            Command="{Binding OpenShiftCommand}" 
+                            Style="{StaticResource BrandButton}" 
+                            Height="44" 
+                            Width="200" 
+                            FontSize="14"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Open Shift Dialog Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsOpenShiftDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Mở ca làm việc mới" Style="{StaticResource Heading2}" Margin="0,0,16,16"/>
+
+                    <TextBlock Text="Số tiền mặt ban đầu trong két (đ) (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding OpeningCashInput, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelOpenShiftCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="XÁC NHẬN MỞ CA" Command="{Binding ConfirmOpenShiftCommand}" Style="{StaticResource PrimaryButton}" Width="140"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Close Shift Dialog Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsCloseShiftDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="460" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Chốt và Đóng ca làm việc" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+
+                    <Border Background="#EFF6FF" CornerRadius="6" Padding="12" Margin="0,0,0,16">
+                        <Grid>
+                            <TextBlock Text="Tiền kỳ vọng hệ thống tính:" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding ShiftSummary.ExpectedCash, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource SectionHeading}" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Text="Số tiền mặt thực tế đếm trong két (đ) (*):" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding ActualCashInput, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <Grid Margin="0,0,0,12">
+                        <TextBlock Text="Chênh lệch (Thực tế - Kỳ vọng):" Style="{StaticResource BodyText}"/>
+                        <TextBlock Text="{Binding CashDifference, Converter={StaticResource CurrencyConverter}}" 
+                                   Style="{StaticResource SectionHeading}" 
+                                   HorizontalAlignment="Right"
+                                   FontWeight="Bold"/>
+                    </Grid>
+
+                    <TextBlock Text="Ghi chú đóng ca:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding ClosingNote, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelCloseShiftCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="CHỐT ĐÓNG CA" Command="{Binding ConfirmCloseShiftCommand}" Style="{StaticResource DangerButton}" Width="130"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Cash Movement Dialog Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsCashMovementDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Ghi nhận Thu / Chi tiền mặt phát sinh" Style="{StaticResource Heading2}" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Loại phát sinh:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <ComboBox SelectedItem="{Binding MovementType}" Margin="0,0,0,12">
+                        <enums:CashMovementType>Expense</enums:CashMovementType>
+                        <enums:CashMovementType>CashIn</enums:CashMovementType>
+                    </ComboBox>
+
+                    <TextBlock Text="Số tiền (đ) (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding MovementAmount, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Lý do chi / thu (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding MovementReason, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelCashMovementCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="GHI NHẬN" Command="{Binding ConfirmCashMovementCommand}" Style="{StaticResource PrimaryButton}" Width="110"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

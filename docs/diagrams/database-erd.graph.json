@@ -1,0 +1,665 @@
+{
+  "direction": "TB",
+  "nodes": [
+    {
+      "id": "branches",
+      "label": "branches\nPK id: uniqueidentifier\ncode: nvarchar(32)\nname: nvarchar(160)\naddress: nvarchar(400)\ntimezoneid: nvarchar(100)\nphone: nvarchar(30)\nisactive: bit\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 220,
+      "height": 230
+    },
+    {
+      "id": "roles",
+      "label": "roles\nPK id: uniqueidentifier\ncode: nvarchar(40)\nname: nvarchar(100)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 200,
+      "height": 90
+    },
+    {
+      "id": "appusers",
+      "label": "appusers\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nusername: nvarchar(64)\nnormalizedusername: nvarchar(64)\nfullname: nvarchar(160)\npasswordhash: nvarchar(500)\nisactive: bit\nfailedlogincount: int\nlockoutendutc: datetime2(7)\nlastloginatutc: datetime2(7)\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 260,
+      "height": 290
+    },
+    {
+      "id": "userroles",
+      "label": "userroles\nPK userid: uniqueidentifier\nPK roleid: uniqueidentifier",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 220,
+      "height": 70
+    },
+    {
+      "id": "refreshtokens",
+      "label": "refreshtokens\nPK id: uniqueidentifier\nFK userid: uniqueidentifier\ntokenhash: char(64)\nexpiresatutc: datetime2(7)\nrevokedatutc: datetime2(7)\nFK replacedbytokenid: uniqueidentifier\ndevicename: nvarchar(200)\ncreatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 300,
+      "height": 190
+    },
+    {
+      "id": "machinegroups",
+      "label": "machinegroups\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\ncode: nvarchar(32)\nname: nvarchar(120)\nsortorder: int\nisactive: bit\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 190
+    },
+    {
+      "id": "machines",
+      "label": "machines\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK machinegroupid: uniqueidentifier\ncode: nvarchar(32)\ndisplayname: nvarchar(120)\nipaddress: varchar(45)\nmacaddress: varchar(17)\nstatus: nvarchar(24)\nlastheartbeatatutc: datetime2(7)\nnotes: nvarchar(1000)\nisactive: bit\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 280,
+      "height": 310
+    },
+    {
+      "id": "pricingplans",
+      "label": "pricingplans\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK machinegroupid: uniqueidentifier\nname: nvarchar(160)\neffectivefromutc: datetime2(7)\neffectivetoutc: datetime2(7)\nisdefault: bit\nisactive: bit\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 280,
+      "height": 230
+    },
+    {
+      "id": "pricingrules",
+      "label": "pricingrules\nPK id: uniqueidentifier\nFK pricingplanid: uniqueidentifier\ndayofweekmask: tinyint\nstarttime: time(0)\nendtime: time(0)\nhourlyrate: decimal(18,2)\npriority: int\ncreatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 270,
+      "height": 190
+    },
+    {
+      "id": "customergroups",
+      "label": "customergroups\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nname: nvarchar(120)\ndiscountpercent: decimal(5,2)\nisactive: bit\ncreatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 150
+    },
+    {
+      "id": "customers",
+      "label": "customers\nPK id: uniqueidentifier\nFK homebranchid: uniqueidentifier\nFK customergroupid: uniqueidentifier\ncode: nvarchar(32)\nfullname: nvarchar(160)\nphone: nvarchar(30)\nemail: nvarchar(254)\ndateofbirth: date\nstatus: nvarchar(20)\njoinedatutc: datetime2(7)\nnotes: nvarchar(1000)\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 310
+    },
+    {
+      "id": "wallets",
+      "label": "wallets\nPK id: uniqueidentifier\nFK customerid: uniqueidentifier\nbalance: decimal(18,2)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 250,
+      "height": 130
+    },
+    {
+      "id": "shifts",
+      "label": "shifts\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK userid: uniqueidentifier\nshiftnumber: nvarchar(40)\nstatus: nvarchar(16)\nopenedatutc: datetime2(7)\nclosedatutc: datetime2(7)\nopeningcash: decimal(18,2)\nexpectedcash: decimal(18,2)\nactualcash: decimal(18,2)\ndifference: decimal(18,2)\nclosingnote: nvarchar(1000)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 290
+    },
+    {
+      "id": "playsessions",
+      "label": "playsessions\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK machineid: uniqueidentifier\nFK customerid: uniqueidentifier\nFK shiftid: uniqueidentifier\nsessionnumber: nvarchar(40)\nbillingmode: nvarchar(24)\nstatus: nvarchar(16)\nstartedatutc: datetime2(7)\npausedatutc: datetime2(7)\nendedatutc: datetime2(7)\ntotalpausedseconds: int\nusageamount: decimal(18,2)\nserviceamount: decimal(18,2)\ndiscountamount: decimal(18,2)\ntotalamount: decimal(18,2)\ninvoiceid: uniqueidentifier\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 250,
+      "height": 430
+    },
+    {
+      "id": "sessionchargesegments",
+      "label": "sessionchargesegments\nPK id: uniqueidentifier\nFK playsessionid: uniqueidentifier\nFK pricingruleid: uniqueidentifier\nstartedatutc: datetime2(7)\nendedatutc: datetime2(7)\nrateperhour: decimal(18,2)\nbillableseconds: int\namount: decimal(18,2)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 270,
+      "height": 190
+    },
+    {
+      "id": "sessionevents",
+      "label": "sessionevents\nPK id: uniqueidentifier\nFK playsessionid: uniqueidentifier\neventtype: nvarchar(32)\noccurredatutc: datetime2(7)\nFK userid: uniqueidentifier\ndatajson: nvarchar(max)\nnote: nvarchar(1000)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 270,
+      "height": 170
+    },
+    {
+      "id": "productcategories",
+      "label": "productcategories\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nname: nvarchar(120)\nsortorder: int\nisactive: bit\ncreatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 150
+    },
+    {
+      "id": "products",
+      "label": "products\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK categoryid: uniqueidentifier\nsku: nvarchar(48)\nname: nvarchar(160)\nunit: nvarchar(32)\nsaleprice: decimal(18,2)\ncostprice: decimal(18,2)\ntrackinventory: bit\nreorderlevel: decimal(18,3)\nisactive: bit\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 250,
+      "height": 310
+    },
+    {
+      "id": "inventorybalances",
+      "label": "inventorybalances\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK productid: uniqueidentifier\nquantityonhand: decimal(18,3)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 150
+    },
+    {
+      "id": "orders",
+      "label": "orders\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nordernumber: nvarchar(40)\nFK playsessionid: uniqueidentifier\nFK customerid: uniqueidentifier\nFK shiftid: uniqueidentifier\nstatus: nvarchar(16)\nsubtotal: decimal(18,2)\ndiscountamount: decimal(18,2)\ntotalamount: decimal(18,2)\nconfirmedatutc: datetime2(7)\ncancelledatutc: datetime2(7)\ncreatedatutc: datetime2(7)\nupdatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 270,
+      "height": 330
+    },
+    {
+      "id": "orderitems",
+      "label": "orderitems\nPK id: uniqueidentifier\nFK orderid: uniqueidentifier\nFK productid: uniqueidentifier\nproductname: nvarchar(160)\nsku: nvarchar(48)\nunit: nvarchar(32)\nquantity: decimal(18,3)\nunitprice: decimal(18,2)\ndiscountamount: decimal(18,2)\nlinetotal: decimal(18,2)\nnote: nvarchar(500)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 250
+    },
+    {
+      "id": "inventorytransactions",
+      "label": "inventorytransactions\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK productid: uniqueidentifier\ntype: nvarchar(24)\nquantity: decimal(18,3)\nquantitybefore: decimal(18,3)\nquantityafter: decimal(18,3)\nunitcost: decimal(18,2)\nreferencetype: nvarchar(40)\nreferenceid: uniqueidentifier\nnote: nvarchar(1000)\noccurredatutc: datetime2(7)\nFK createdbyuserid: uniqueidentifier",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 290
+    },
+    {
+      "id": "invoices",
+      "label": "invoices\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\ninvoicenumber: nvarchar(40)\nFK customerid: uniqueidentifier\nFK playsessionid: uniqueidentifier\nFK shiftid: uniqueidentifier\nstatus: nvarchar(16)\nsubtotal: decimal(18,2)\ndiscountamount: decimal(18,2)\ntotalamount: decimal(18,2)\npaidamount: decimal(18,2)\nchangeamount: decimal(18,2)\nissuedatutc: datetime2(7)\npaidatutc: datetime2(7)\nvoidedatutc: datetime2(7)\nvoidreason: nvarchar(1000)\ncreatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 270,
+      "height": 390
+    },
+    {
+      "id": "invoicelines",
+      "label": "invoicelines\nPK id: uniqueidentifier\nFK invoiceid: uniqueidentifier\nlinetype: nvarchar(24)\nreferenceid: uniqueidentifier\ndescription: nvarchar(300)\nquantity: decimal(18,3)\nunitprice: decimal(18,2)\ndiscountamount: decimal(18,2)\nlinetotal: decimal(18,2)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 210
+    },
+    {
+      "id": "payments",
+      "label": "payments\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK invoiceid: uniqueidentifier\nFK customerid: uniqueidentifier\nFK shiftid: uniqueidentifier\npaymentnumber: nvarchar(40)\ntype: nvarchar(16)\nmethod: nvarchar(24)\namount: decimal(18,2)\nstatus: nvarchar(16)\nexternalreference: nvarchar(160)\npaidatutc: datetime2(7)\nnote: nvarchar(1000)\nFK createdbyuserid: uniqueidentifier",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 310
+    },
+    {
+      "id": "wallettransactions",
+      "label": "wallettransactions\nPK id: uniqueidentifier\nFK walletid: uniqueidentifier\nFK branchid: uniqueidentifier\ntype: nvarchar(24)\namount: decimal(18,2)\nbalancebefore: decimal(18,2)\nbalanceafter: decimal(18,2)\nreferencetype: nvarchar(40)\nreferenceid: uniqueidentifier\ndescription: nvarchar(500)\noccurredatutc: datetime2(7)\nFK shiftid: uniqueidentifier\nFK createdbyuserid: uniqueidentifier",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 290
+    },
+    {
+      "id": "cashmovements",
+      "label": "cashmovements\nPK id: uniqueidentifier\nFK shiftid: uniqueidentifier\ntype: nvarchar(24)\namount: decimal(18,2)\nreferencetype: nvarchar(40)\nreferenceid: uniqueidentifier\ndescription: nvarchar(500)\noccurredatutc: datetime2(7)\nFK createdbyuserid: uniqueidentifier",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 210
+    },
+    {
+      "id": "expensecategories",
+      "label": "expensecategories\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nname: nvarchar(120)\nisactive: bit\ncreatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 130
+    },
+    {
+      "id": "expenses",
+      "label": "expenses\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK shiftid: uniqueidentifier\nFK categoryid: uniqueidentifier\namount: decimal(18,2)\nspentatutc: datetime2(7)\ndescription: nvarchar(1000)\nreceiptnumber: nvarchar(100)\nstatus: nvarchar(16)\nFK approvedbyuserid: uniqueidentifier\nFK createdbyuserid: uniqueidentifier\ncreatedatutc: datetime2(7)\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 290
+    },
+    {
+      "id": "maintenancetickets",
+      "label": "maintenancetickets\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK machineid: uniqueidentifier\nticketnumber: nvarchar(40)\npriority: nvarchar(16)\nstatus: nvarchar(20)\ntitle: nvarchar(200)\ndescription: nvarchar(2000)\nFK assignedtouserid: uniqueidentifier\nopenedatutc: datetime2(7)\nresolvedatutc: datetime2(7)\nclosedatutc: datetime2(7)\nresolution: nvarchar(2000)\ncost: decimal(18,2)\nFK createdbyuserid: uniqueidentifier\nrowversion: rowversion",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 350
+    },
+    {
+      "id": "maintenancelogs",
+      "label": "maintenancelogs\nPK id: uniqueidentifier\nFK ticketid: uniqueidentifier\nstatusfrom: nvarchar(20)\nstatusto: nvarchar(20)\nnote: nvarchar(2000)\ncostdelta: decimal(18,2)\noccurredatutc: datetime2(7)\nFK userid: uniqueidentifier",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 190
+    },
+    {
+      "id": "branchsettings",
+      "label": "branchsettings\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nkey: nvarchar(120)\nvaluejson: nvarchar(max)\nupdatedatutc: datetime2(7)\nFK updatedbyuserid: uniqueidentifier",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 290,
+      "height": 150
+    },
+    {
+      "id": "auditlogs",
+      "label": "auditlogs\nPK id: uniqueidentifier\nFK branchid: uniqueidentifier\nFK userid: uniqueidentifier\naction: nvarchar(100)\nentitytype: nvarchar(120)\nentityid: uniqueidentifier\noldvaluesjson: nvarchar(max)\nnewvaluesjson: nvarchar(max)\nipaddress: varchar(45)\ncorrelationid: nvarchar(100)\noccurredatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 240,
+      "height": 250
+    },
+    {
+      "id": "idempotencyrecords",
+      "label": "idempotencyrecords\nPK id: uniqueidentifier\nscope: nvarchar(120)\nkey: nvarchar(100)\nrequesthash: char(64)\nresponsestatuscode: int\nresponsebody: nvarchar(max)\nexpiresatutc: datetime2(7)\ncreatedatutc: datetime2(7)",
+      "style": "rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fillColor=#dae8fc;strokeColor=#6c8ebf;",
+      "width": 220,
+      "height": 190
+    }
+  ],
+  "edges": [
+    {
+      "source": "appusers",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "userroles",
+      "target": "appusers",
+      "label": "userid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "userroles",
+      "target": "roles",
+      "label": "roleid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "refreshtokens",
+      "target": "appusers",
+      "label": "userid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "machinegroups",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "machines",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "machines",
+      "target": "machinegroups",
+      "label": "machinegroupid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "pricingplans",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "pricingplans",
+      "target": "machinegroups",
+      "label": "machinegroupid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "pricingrules",
+      "target": "pricingplans",
+      "label": "pricingplanid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "customergroups",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "customers",
+      "target": "branches",
+      "label": "homebranchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "customers",
+      "target": "customergroups",
+      "label": "customergroupid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "wallets",
+      "target": "customers",
+      "label": "customerid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "shifts",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "shifts",
+      "target": "appusers",
+      "label": "userid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "playsessions",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "playsessions",
+      "target": "machines",
+      "label": "machineid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "playsessions",
+      "target": "customers",
+      "label": "customerid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "playsessions",
+      "target": "shifts",
+      "label": "shiftid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "sessionchargesegments",
+      "target": "playsessions",
+      "label": "playsessionid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "sessionchargesegments",
+      "target": "pricingrules",
+      "label": "pricingruleid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "sessionevents",
+      "target": "playsessions",
+      "label": "playsessionid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "sessionevents",
+      "target": "appusers",
+      "label": "userid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "productcategories",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "products",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "products",
+      "target": "productcategories",
+      "label": "categoryid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "inventorybalances",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "inventorybalances",
+      "target": "products",
+      "label": "productid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "orders",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "orders",
+      "target": "playsessions",
+      "label": "playsessionid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "orders",
+      "target": "customers",
+      "label": "customerid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "orders",
+      "target": "shifts",
+      "label": "shiftid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "orderitems",
+      "target": "orders",
+      "label": "orderid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "orderitems",
+      "target": "products",
+      "label": "productid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "inventorytransactions",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "inventorytransactions",
+      "target": "products",
+      "label": "productid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "inventorytransactions",
+      "target": "appusers",
+      "label": "createdbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "invoices",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "invoices",
+      "target": "customers",
+      "label": "customerid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "invoices",
+      "target": "playsessions",
+      "label": "playsessionid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "invoices",
+      "target": "shifts",
+      "label": "shiftid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "invoicelines",
+      "target": "invoices",
+      "label": "invoiceid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "payments",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "payments",
+      "target": "invoices",
+      "label": "invoiceid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "payments",
+      "target": "customers",
+      "label": "customerid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "payments",
+      "target": "shifts",
+      "label": "shiftid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "payments",
+      "target": "appusers",
+      "label": "createdbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "wallettransactions",
+      "target": "wallets",
+      "label": "walletid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "wallettransactions",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "wallettransactions",
+      "target": "shifts",
+      "label": "shiftid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "wallettransactions",
+      "target": "appusers",
+      "label": "createdbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "cashmovements",
+      "target": "shifts",
+      "label": "shiftid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "cashmovements",
+      "target": "appusers",
+      "label": "createdbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "expensecategories",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "expenses",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "expenses",
+      "target": "shifts",
+      "label": "shiftid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "expenses",
+      "target": "expensecategories",
+      "label": "categoryid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "expenses",
+      "target": "appusers",
+      "label": "approvedbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "expenses",
+      "target": "appusers",
+      "label": "createdbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "maintenancetickets",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "maintenancetickets",
+      "target": "machines",
+      "label": "machineid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "maintenancetickets",
+      "target": "appusers",
+      "label": "assignedtouserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "maintenancetickets",
+      "target": "appusers",
+      "label": "createdbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "maintenancelogs",
+      "target": "maintenancetickets",
+      "label": "ticketid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "maintenancelogs",
+      "target": "appusers",
+      "label": "userid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "branchsettings",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "branchsettings",
+      "target": "appusers",
+      "label": "updatedbyuserid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "auditlogs",
+      "target": "branches",
+      "label": "branchid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    },
+    {
+      "source": "auditlogs",
+      "target": "appusers",
+      "label": "userid",
+      "style": "edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;startArrow=ERmany;startFill=0;endArrow=ERone;endFill=0;"
+    }
+  ]
+}

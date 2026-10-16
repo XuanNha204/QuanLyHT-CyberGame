@@ -1,0 +1,188 @@
+<UserControl x:Class="CyberGame.Client.Views.InventoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Quản lý kho hàng &amp; Tồn kho" Style="{StaticResource Heading1}"/>
+                <TextBlock Text="Theo dõi mức tồn kho, nhập hàng mới và kiểm kê điều chỉnh số lượng" Style="{StaticResource MutedText}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="+ Thêm mặt hàng" Command="{Binding OpenCreateProductCommand}" Style="{StaticResource BrandButton}" Margin="0,0,8,0"/>
+                <Button Content="+ Nhập kho" Command="{Binding OpenReceiveStockCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,8,0"/>
+                <Button Content="Điều chỉnh / Kiểm kê" Command="{Binding OpenAdjustStockCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0"/>
+                <Button Content="Làm mới" Command="{Binding RefreshCommand}" Style="{StaticResource OutlineButton}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Filter & Alerts -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,16">
+            <CheckBox Content="Chỉ hiển thị mặt hàng sắp hết tồn kho (Dưới mức cảnh báo)" 
+                      IsChecked="{Binding FilterLowStockOnly}" 
+                      FontWeight="SemiBold" 
+                      FontSize="13" 
+                      Foreground="{StaticResource DangerBrush}" 
+                      Margin="0,0,0,12"/>
+
+            <Border Background="#FEF2F2" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,6"
+                    Visibility="{Binding HasError, Converter={StaticResource BoolToVisConverter}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontSize="12"/>
+            </Border>
+            <Border Background="#F0FDF4" BorderBrush="{StaticResource SuccessBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,6"
+                    Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVisConverter}}">
+                <TextBlock Text="{Binding SuccessMessage}" Foreground="{StaticResource SuccessBrush}" FontSize="12"/>
+            </Border>
+        </StackPanel>
+
+        <!-- Inventory DataGrid -->
+        <Border Grid.Row="2" Style="{StaticResource CardPanel}">
+            <DataGrid ItemsSource="{Binding FilteredItems}" 
+                      SelectedItem="{Binding SelectedItem}"
+                      IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Mã SKU" Binding="{Binding Sku}" Width="100"/>
+                    <DataGridTextColumn Header="Tên mặt hàng" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Nhóm hàng" Binding="{Binding CategoryName}" Width="150"/>
+                    <DataGridTextColumn Header="Đơn vị" Binding="{Binding Unit}" Width="80"/>
+                    <DataGridTextColumn Header="Tồn kho" Binding="{Binding QuantityOnHand, StringFormat='{}{0:N0}'}" Width="100"/>
+                    <DataGridTextColumn Header="Mức cảnh báo" Binding="{Binding ReorderLevel, StringFormat='{}{0:N0}'}" Width="110"/>
+                    <DataGridTextColumn Header="Giá vốn" Binding="{Binding CostPrice, Converter={StaticResource CurrencyConverter}}" Width="110"/>
+                    <DataGridTextColumn Header="Giá bán" Binding="{Binding SalePrice, Converter={StaticResource CurrencyConverter}}" Width="110"/>
+                    <DataGridTemplateColumn Header="Trạng thái" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="{Binding IsLowStock, Converter={StaticResource BoolToVisConverter}, ConverterParameter='#FEE2E2', FallbackValue='#DCFCE7'}" 
+                                        CornerRadius="4" 
+                                        Padding="6,2" 
+                                        HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding IsLowStock, Converter={StaticResource BoolToVisConverter}, ConverterParameter='SẮP HẾT HÀNG', FallbackValue='ĐỦ TỒN KHO'}" 
+                                               FontSize="11" 
+                                               FontWeight="Bold" 
+                                               Foreground="{Binding IsLowStock, Converter={StaticResource BoolToVisConverter}, ConverterParameter='#DC2626', FallbackValue='#15803D'}"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Create Product Dialog Overlay -->
+        <Border Grid.RowSpan="3" Background="#80000000" Visibility="{Binding IsCreateProductDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="520" MaxHeight="660" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Thêm món ăn / thức uống" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Nhóm món (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                        <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedNewCategory}" DisplayMemberPath="Name" Margin="0,0,0,10"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="Mã SKU (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                                <TextBox Text="{Binding NewSku, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                <TextBlock Text="Đơn vị (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                                <TextBox Text="{Binding NewUnit, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Tên món / mặt hàng (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                        <TextBox Text="{Binding NewProductName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,10"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="Giá bán (đ) (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                                <TextBox Text="{Binding NewSalePrice, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                <TextBlock Text="Giá vốn (đ):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                                <TextBox Text="{Binding NewCostPrice, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <CheckBox Content="Theo dõi tồn kho" IsChecked="{Binding NewTrackInventory}" Margin="0,0,0,10"/>
+
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="Tồn kho ban đầu:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                                <TextBox Text="{Binding NewInitialStock, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                <TextBlock Text="Mức cảnh báo:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                                <TextBox Text="{Binding NewReorderLevel, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Hủy" Command="{Binding CancelCreateProductCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                            <Button Content="THÊM MẶT HÀNG" Command="{Binding ConfirmCreateProductCommand}" Style="{StaticResource PrimaryButton}" Width="140"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Border>
+
+        <!-- Receive Stock Dialog Overlay -->
+        <Border Grid.RowSpan="3" Background="#80000000" Visibility="{Binding IsReceiveStockDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Nhập hàng hóa vào kho" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding SelectedItem.Name, StringFormat='Mặt hàng: {0}'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Số lượng nhập (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding ReceiveQuantity, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Đơn giá vốn nhập (đ) (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding ReceiveUnitCost, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Ghi chú nhập hàng:" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding ReceiveNote, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelReceiveStockCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="XÁC NHẬN NHẬP" Command="{Binding ConfirmReceiveStockCommand}" Style="{StaticResource PrimaryButton}" Width="130"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Adjust Stock Dialog Overlay -->
+        <Border Grid.RowSpan="3" Background="#80000000" Visibility="{Binding IsAdjustStockDialogOpen, Converter={StaticResource BoolToVisConverter}}">
+            <Border Width="420" Style="{StaticResource CardPanel}" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Kiểm kê &amp; Điều chỉnh số lượng tồn" Style="{StaticResource Heading2}" Margin="0,0,0,12"/>
+                    <TextBlock Text="{Binding SelectedItem.Name, StringFormat='Mặt hàng: {0}'}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Số lượng tồn thực tế sau kiểm kê (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding AdjustActualQuantity, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Lý do điều chỉnh (*):" Style="{StaticResource BodyText}" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding AdjustReason, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource StandardTextBox}" Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Hủy" Command="{Binding CancelAdjustStockCommand}" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Width="80"/>
+                        <Button Content="LƯU ĐIỀU CHỈNH" Command="{Binding ConfirmAdjustStockCommand}" Style="{StaticResource PrimaryButton}" Width="130"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

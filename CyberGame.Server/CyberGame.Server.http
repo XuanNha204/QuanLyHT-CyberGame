@@ -1,0 +1,6 @@
+@CyberGame.Server_HostAddress = http://localhost:5227
+
+GET {{CyberGame.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

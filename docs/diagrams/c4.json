@@ -1,0 +1,152 @@
+{
+  "title": "CyberGame Manager",
+  "levels": [
+    {
+      "name": "System Context",
+      "elements": [
+        {
+          "id": "operator",
+          "type": "person",
+          "label": "Nhân viên vận hành",
+          "desc": "Owner, Manager, Cashier hoặc Technician"
+        },
+        {
+          "id": "customer",
+          "type": "person",
+          "label": "Khách hàng",
+          "desc": "Hội viên hoặc khách vãng lai sử dụng máy và dịch vụ"
+        },
+        {
+          "id": "cybergame-system",
+          "type": "system",
+          "label": "CyberGame Manager",
+          "desc": "Quản lý vận hành, phiên chơi, bán hàng, tài chính và thiết bị",
+          "children": "Containers"
+        },
+        {
+          "id": "bank-system",
+          "type": "external",
+          "label": "Ngân hàng/QR",
+          "desc": "Đối soát tham chiếu chuyển khoản; tích hợp tự động sau MVP"
+        }
+      ],
+      "relations": [
+        { "from": "operator", "to": "cybergame-system", "label": "Vận hành qua ứng dụng desktop" },
+        { "from": "customer", "to": "cybergame-system", "label": "Phát sinh phiên chơi, ví và hóa đơn" },
+        { "from": "cybergame-system", "to": "bank-system", "label": "Ghi nhận mã tham chiếu thanh toán" }
+      ]
+    },
+    {
+      "name": "Containers",
+      "elements": [
+        {
+          "id": "wpf-client",
+          "type": "container",
+          "label": "Ứng dụng quản lý",
+          "tech": "WPF .NET 10",
+          "desc": "MVVM desktop UI cho nhân viên"
+        },
+        {
+          "id": "web-api",
+          "type": "container",
+          "label": "CyberGame API",
+          "tech": "ASP.NET Core .NET 10",
+          "desc": "Xác thực, nghiệp vụ, transaction và báo cáo",
+          "children": "API Components"
+        },
+        {
+          "id": "sql-database",
+          "type": "database",
+          "label": "CyberGame Database",
+          "tech": "SQL Server + EF Core",
+          "desc": "Dữ liệu nghiệp vụ, ledger và audit"
+        }
+      ],
+      "relations": [
+        { "from": "wpf-client", "to": "web-api", "label": "JSON/HTTPS + JWT" },
+        { "from": "web-api", "to": "sql-database", "label": "T-SQL qua EF Core" }
+      ]
+    },
+    {
+      "name": "API Components",
+      "elements": [
+        {
+          "id": "identity-component",
+          "type": "component",
+          "label": "Identity & RBAC",
+          "tech": "JWT/Password Hashing",
+          "desc": "Đăng nhập, token, vai trò và khóa tài khoản"
+        },
+        {
+          "id": "station-component",
+          "type": "component",
+          "label": "Stations & Pricing",
+          "tech": "Application Services",
+          "desc": "Máy, khu máy, bảng giá và trạng thái"
+        },
+        {
+          "id": "session-component",
+          "type": "component",
+          "label": "Session Engine",
+          "tech": "Domain Services",
+          "desc": "State machine và tính phí theo segment"
+        },
+        {
+          "id": "wallet-component",
+          "type": "component",
+          "label": "Customers & Wallet",
+          "tech": "Ledger Services",
+          "desc": "Hội viên, số dư và ledger bất biến"
+        },
+        {
+          "id": "sales-component",
+          "type": "component",
+          "label": "Sales & Inventory",
+          "tech": "Transactional Services",
+          "desc": "Sản phẩm, đơn hàng và tồn kho"
+        },
+        {
+          "id": "billing-component",
+          "type": "component",
+          "label": "Billing & Cashier",
+          "tech": "Transactional Services",
+          "desc": "Hóa đơn, payment, ca và dòng tiền"
+        },
+        {
+          "id": "ops-component",
+          "type": "component",
+          "label": "Maintenance & Expenses",
+          "tech": "Application Services",
+          "desc": "Bảo trì thiết bị và chi phí vận hành"
+        },
+        {
+          "id": "reporting-component",
+          "type": "component",
+          "label": "Reporting",
+          "tech": "EF Core Projections",
+          "desc": "Dashboard và báo cáo đọc tối ưu"
+        },
+        {
+          "id": "persistence-component",
+          "type": "component",
+          "label": "Persistence & Audit",
+          "tech": "EF Core SQL Server",
+          "desc": "DbContext, transaction, idempotency và audit"
+        }
+      ],
+      "relations": [
+        { "from": "identity-component", "to": "persistence-component", "label": "Đọc/ghi identity" },
+        { "from": "station-component", "to": "persistence-component", "label": "Đọc/ghi máy và giá" },
+        { "from": "session-component", "to": "station-component", "label": "Kiểm tra máy và giá" },
+        { "from": "session-component", "to": "wallet-component", "label": "Khấu trừ/hoàn ví" },
+        { "from": "session-component", "to": "billing-component", "label": "Tạo invoice cuối phiên" },
+        { "from": "sales-component", "to": "billing-component", "label": "Đưa order vào invoice" },
+        { "from": "wallet-component", "to": "persistence-component", "label": "Ghi wallet ledger" },
+        { "from": "sales-component", "to": "persistence-component", "label": "Ghi inventory ledger" },
+        { "from": "billing-component", "to": "persistence-component", "label": "Ghi payment/cash ledger" },
+        { "from": "ops-component", "to": "persistence-component", "label": "Ghi vận hành" },
+        { "from": "reporting-component", "to": "persistence-component", "label": "Query chỉ đọc" }
+      ]
+    }
+  ]
+}

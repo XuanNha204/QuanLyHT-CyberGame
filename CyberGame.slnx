@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="CyberGame.Domain/CyberGame.Domain.csproj" />
+  <Project Path="CyberGame.Application/CyberGame.Application.csproj" />
+  <Project Path="CyberGame.Infrastructure/CyberGame.Infrastructure.csproj" />
+  <Project Path="CyberGame.Server/CyberGame.Server.csproj" />
+  <Project Path="CyberGame.Client/CyberGame.Client.csproj" />
+  <Project Path="CyberGame.MemberClient/CyberGame.MemberClient.csproj" />
+  <Project Path="CyberGame.Tests/CyberGame.Tests.csproj" />
+</Solution>
